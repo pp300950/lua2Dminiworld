@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pixel Block Color Picker</title>
+ <style>
+#container {
+        display: flex;
+        flex-wrap: wrap;
+        width: 400px;
+        height: 400px;
+      }
+      .pixel {
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+      }
+      #color-picker-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      #color-picker-label {
+        margin-right: 10px;
+      }
+      #generate-code-btn {
+        margin-left: 10px;
+     margin-top: 200px;
+      }
+
+ </style>
+  </head>
+  <body>
+    
+<div id="color-picker-container">
+<label for="color-picker" id="color-picker-label">Choose a color:</label>
+<input type="color" id="color-picker" list="color-list">
+<datalist id="color-list">
+  <option value="#FFFFFF">White</option>
+  <option value="#FFA500">Orange</option>
+  <option value="#C71585">Pink</option>
+  <!-- เพิ่ม option สำหรับสีอื่นๆ ที่คุณต้องการแสดง -->
+</datalist>
+
+<div id="container">
+  <!-- Pixel canvas will be created dynamically with JavaScript -->
+</div>
+<button id="generate-code-btn">Generate Code</button>
+<div id="code-output"></div>
+<script>
+const generateCodeBtn = document.getElementById('generate-code-btn');
+generateCodeBtn.addEventListener('click', generateCode);
+const container = document.getElementById('container');
+const codeOutput = document.getElementById('code-output');
+const colorPicker = document.getElementById('color-picker');
+/*const colorID = pixel.dataset.colorId;*/
+const colorIDs = 
+{
+  '#FFFFFF': 667,
+  '#FFA500': 668,
+  '#C71585': 669,
+  '#ADD8E6': 670,
+  '#FFFF00': 671,
+  '#90EE90': 672,
+  '#FFC0CB': 673,
+  '#808080': 674,
+  '#D3D3D3': 675,
+  '#00FFFF': 676,
+  '#800080': 677,
+  '#0000FF': 678,
+  '#964B00': 679,
+  '#008000': 680,
+  '#FF0000': 681,
+  '#000000': 682
+};
+
+// ใช้ grid layout เพื่อสร้างพิกเซล
+container.style.display = 'grid';
+container.style.gridTemplateColumns = 'repeat(20, 20px)';
+container.style.gridTemplateRows = 'repeat(20, 20px)';
+
+// สร้างพิกเซลแบบดั้งเดิม แต่ใช้ CSS Grid Layout เพื่อกำหนดพิกัดแบบเดียวกับใน generateCode function
+for (let y = 0; y < 20; y++) {
+  for (let x = 0; x < 20; x++) {
+    const pixel = document.createElement('div');
+    pixel.classList.add('pixel');
+    pixel.dataset.x = x;
+    pixel.dataset.y = y;
+    pixel.dataset.colorId = '';
+    
+    container.appendChild(pixel);
+    
+  }
+}
+
+container.addEventListener('click', function(event) {
+  if (event.target.classList.contains('pixel')) {
+    const selectedColor = colorPicker.value;
+    if (selectedColor in colorIDs) {
+      event.target.style.backgroundColor = selectedColor;
+      event.target.dataset.color = selectedColor;
+      event.target.dataset.colorId = colorIDs[selectedColor]
+    }
+  }
+});
+
+function generateCode() {
+  let code = '';
+  container.querySelectorAll('.pixel').forEach(pixel => {
+    const color = pixel.dataset.color;
+    if (color && color in colorIDs) {
+      const colorID = colorIDs[color];
+      const posX = Number(pixel.dataset.x);
+      const posZ = 19 - Number(pixel.dataset.y);
+      code += `Block:replaceBlock(${colorID}, ${posX}, 7, ${posZ}, FACE_DIRECTION.DIR_POS_Y);\n`;
+    }
+  });
+  codeOutput.textContent = code
+}
+</script>
+
+  </body>
+</html>
